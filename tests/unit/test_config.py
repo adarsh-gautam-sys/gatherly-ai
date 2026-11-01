@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from gatherly.config import Settings
 
@@ -68,3 +68,48 @@ def test_validation_error_does_not_include_input(
     with pytest.raises(ValidationError) as error:
         Settings()
     assert untrusted_value not in str(error.value)
+
+
+def test_gemini_aliases_limits_and_secret_redaction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Settings load documented aliases without exposing credentials in dumps."""
+    monkeypatch.setenv("GEMINI_API_KEY", "private-test-value")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    monkeypatch.setenv("GATHERLY_AI_CONCURRENCY", "2")
+    monkeypatch.setenv("GATHERLY_AI_TIMEOUT_SECONDS", "4")
+    monkeypatch.setenv("GATHERLY_CACHE_CAPACITY", "8")
+    monkeypatch.setenv("GATHERLY_CACHE_TTL_SECONDS", "60")
+    settings = Settings()
+    assert settings.gemini_api_key.get_secret_value() == "private-test-value"
+    assert settings.ai_concurrency == 2
+    assert settings.ai_timeout_seconds == 4
+    assert settings.cache_capacity == 8
+    assert settings.cache_ttl_seconds == 60
+    assert "private-test-value" not in repr(settings) + settings.model_dump_json()
+    assert "gemini_api_key" not in settings.model_dump()
+    assert Settings(gemini_api_key=SecretStr("override")).gemini_api_key == SecretStr(
+        "override"
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("GATHERLY_AI_CONCURRENCY", "0"),
+        ("GATHERLY_AI_CONCURRENCY", "17"),
+        ("GATHERLY_AI_TIMEOUT_SECONDS", "7"),
+        ("GATHERLY_CACHE_CAPACITY", "1025"),
+        ("GATHERLY_CACHE_TTL_SECONDS", "3601"),
+        ("GEMINI_MODEL", "https://example.com"),
+    ],
+)
+def test_invalid_ai_configuration_is_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+    name: str,
+    value: str,
+) -> None:
+    """Provider configuration cannot remove resource bounds or inject an endpoint."""
+    monkeypatch.setenv(name, value)
+    with pytest.raises(ValidationError):
+        Settings()

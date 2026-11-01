@@ -3,7 +3,7 @@
 Turn a few event details into a realistic celebration plan, with deterministic
 budgets, timelines and checklists plus creative ideas from Gemini.
 
-**Phase 1 domain core implemented.** CI and coverage badges will be linked when the
+**Phase 2 Gemini integration implemented.** CI and coverage badges will be linked when the
 GitHub repository exists. A screenshot will be added after the Phase 5 frontend.
 The source of truth is [the PRD](docs/PRD.md).
 
@@ -13,7 +13,7 @@ Celebration & Event Planning: weddings, birthdays and community events.
 
 ## Approach and Logic
 
-Deterministic code will handle money, dates and checklists. Gemini will provide
+Deterministic code handles money, dates and checklists. Gemini provides
 schema-constrained creative ideas and refinement, with deterministic fallback.
 
 ```mermaid
@@ -23,8 +23,8 @@ flowchart LR
     Services --> Infra[Injected infrastructure adapters]
 ```
 
-The deterministic domain engines are implemented. Service orchestration and
-Gemini integration arrive in Phase 2; planning endpoints arrive in Phase 3.
+The deterministic engines and service orchestration are implemented, including
+Gemini integration and fallback. Planning endpoints arrive in Phase 3.
 
 ## How the Solution Works
 
@@ -34,14 +34,17 @@ The package version is also used in development OpenAPI documentation.
 API docs are disabled by default. No planning endpoints are implemented yet.
 Pure Python domain functions generate budgets, chronological milestones with
 phase labels, and vendor checklists. See the [domain example and policies](docs/PHASE_1.md).
+The injected plan service combines those components with validated creative ideas,
+retries one failed model call, and falls back to templates. See the
+[service example and integration decisions](docs/PHASE_2.md).
 
 ## Assumptions
 
 - Python 3.12 and Git are installed; GNU Make is available on PATH.
 - The server is stateless; no database, accounts or stored personal data.
-- The current implementation needs no Gemini key. Integration arrives in Phase 2.
+- The service works without a Gemini key, using deterministic template ideas.
 - Central settings live in `config.py`, matching PRD section 11. Domain packages
-  remain free of I/O. Later service adapters will use dependency injection.
+  remain free of I/O. Services receive the LLM, cache and clock as dependencies.
 - See [Phase 0 verification notes](docs/PHASE_0.md) for submission-rule uncertainty.
 - Money is integer minor units in INR, USD, EUR, GBP or JPY. Numerical heuristics,
   bounds and timeline interpretation are documented in [Phase 1](docs/PHASE_1.md).
@@ -51,7 +54,8 @@ phase labels, and vendor checklists. See the [domain example and policies](docs/
 Budgets use exact integer allocation, guest-aware food shares and contingency.
 Timelines compress when lead time is short and mark missed deadlines due now.
 Vendor checklists link allocations to questions, documents and booking guidance.
-All three event types are covered. Personalized ideas arrive in Phase 2.
+All three event types are covered. Gemini provides three themes, menus, activities,
+personal touches and saving tips tied to actual budget categories.
 
 ## Security
 
@@ -59,13 +63,15 @@ No secrets are required or committed. `.env` is ignored; only `.env.example` is
 tracked. Settings use a strict environment whitelist and reject unknown dotenv
 keys. Error messages hide input values. Development access logging is disabled
 to avoid recording URL query text. `make check` runs Bandit, pip-audit and
-gitleaks. The complete threat model and API protections arrive in later phases.
+gitleaks. Free text is delimited and escaped in prompts; generated text is strictly
+validated and sanitised before caching or returning it. API protections and the
+complete threat model arrive in later phases.
 
 ## Efficiency
 
-The health endpoint has no external calls. No frontend, database or AI dependency
-is installed. Domain engines use small fixed templates and no external calls.
-Caching and model-call controls arrive in Phase 2.
+The health endpoint and domain engines have no external calls. One structured
+model call generates ideas, with at most one retry. Timeouts, a concurrency cap,
+an output token ceiling and a bounded TTL/LRU cache control resource use.
 
 ## Testing
 
@@ -102,6 +108,12 @@ documentation, set `GATHERLY_ENVIRONMENT=development` in that file and restart.
 The only supported values are `development` and `production` (the default).
 Explicit factory settings override environment variables, which override `.env`.
 
+For creative generation, configure `GEMINI_API_KEY` locally. The default
+`GEMINI_MODEL` is `gemini-3.5-flash-lite`. No key means fallback mode. The service
+defaults to a six-second timeout per attempt, four concurrent calls, and a cache
+of 128 successful idea sets lasting 300 seconds. `.env.example` lists the setting
+names; [Phase 2 notes](docs/PHASE_2.md) describe limits and the opt-in live test.
+
 Docker and Cloud Run instructions will be added in Phase 4.
 
 ## Project structure
@@ -113,17 +125,19 @@ src/gatherly/
   main.py           application factory
   config.py         environment and dotenv settings
   api/              health route and response schema
-  services/         empty orchestration package
+  services/         plan orchestration, protocols and creative output validation
   domain/           models, budget, timeline, vendors and immutable templates
-  infra/            empty adapter package
+  infra/            Gemini, clock, prompt loading, cache and runtime composition
+prompts/            packaged, versioned system and refinement policies
 tests/
   api/              health and documentation tests
   unit/             settings, domain, template and architecture tests
   property/         generated budget and timeline invariants
+  security/         injection and creative output sanitisation tests
+  live/             optional Gemini smoke test, disabled in CI
 ```
 
-Prompt files, the frontend, future test suites and deployment files will be
-created in their assigned phases.
+The frontend, API routes and deployment files will be created in their assigned phases.
 
 ## Development commands
 
@@ -147,6 +161,8 @@ all checks on the new lock. Never commit virtualenvs, binaries or test reports.
 
 ## Limitations and future work
 
-The domain engines produce deterministic planning components; full plans and AI
-are not yet integrated. Phase 2 starts only after explicit approval. Hosted CI and repository
-visibility cannot be verified until a GitHub remote is configured.
+Full plans and partial creative refinement are available through the Python
+service. Refinement accepts explicit affected sections and an integer budget
+override; money is never inferred by the model. The HTTP planning API starts in
+Phase 3 after approval. Live model quality and latency need a configured key;
+hosted CI and repository visibility need a GitHub remote.

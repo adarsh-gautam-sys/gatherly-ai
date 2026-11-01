@@ -11,6 +11,7 @@ requires-python = ">=3.12,<3.13"
 license = "MIT"
 dependencies = [
     "fastapi==0.162.0",
+    "google-genai==2.34.0",
     "pydantic==2.14.2",
     "pydantic-settings==2.16.2",
     "uvicorn==0.54.0",
@@ -35,7 +36,7 @@ dev = [
 path = "src/gatherly/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/gatherly"]
+packages = ["src/gatherly", "prompts"]
 
 [tool.ruff]
 target-version = "py312"
@@ -63,6 +64,7 @@ warn_required_dynamic_aliases = true
 testpaths = ["tests"]
 addopts = "--strict-config --strict-markers --import-mode=importlib --cov=gatherly --cov-report=term-missing --cov-report=xml"
 filterwarnings = ["error"]
+markers = ["live: opt-in Gemini API smoke test (requires GEMINI_API_KEY)"]
 
 [tool.coverage.run]
 branch = true

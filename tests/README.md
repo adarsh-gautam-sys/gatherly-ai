@@ -22,5 +22,21 @@ blocks I/O dependencies and direct system-clock calls. `make test` now applies
 a separate 100% domain statement/branch coverage gate after the overall 90% gate.
 The GitHub workflow uses the same Make target.
 
-Service, security and accessibility suites arrive with their features in later
-PRD phases. No live Gemini test or frontend is added in Phase 1.
+Phase 2 adds fake-LLM service tests for complete plans, cache reuse, retries,
+timeout cancellation, budget-first refinement and fallback. The actual Google
+SDK runs against HTTPX MockTransport to verify schema serialization, response
+parsing, partial patches, safety blocks, provider errors and bounded retries.
+Concurrency tests cover waiting-call cancellation and slot reuse. Runtime tests
+verify explicit client cleanup, including shutdown failure.
+
+Security tests put adversarial delimiters in every event free-text field and
+refinement instructions. They verify escaped JSON boundaries, strict output
+shapes, HTML/script/contact stripping, confidential-text and price rejection,
+and valid links to budget categories. Configuration tests check bounds and
+secret exclusion. Cache tests check LRU eviction and exact TTL expiry.
+
+The optional `live` test uses synthetic data and real credentials only when
+`GATHERLY_RUN_LIVE_TEST=1`; it is always skipped when `CI` is set. Run it with
+`GEMINI_API_KEY` in the environment and `python -m pytest tests/live -m live --no-cov`
+using the project virtualenv. It is excluded from normal offline verification.
+Accessibility tests arrive with the Phase 5 frontend.
