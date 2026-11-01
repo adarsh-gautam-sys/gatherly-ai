@@ -85,14 +85,14 @@ branch and format rules remain unverified; do not invent compliance claims.
   Preserve strict validation, safe errors, request limits and privacy controls.
 - No real booking, payments, accounts, native apps, image-generation product
   feature or additional event types. Stretch work waits until the PRD is complete.
-- Work proceeds one PRD phase at a time. Phase 4 is committed. This initialization
-  records context only; Phase 5 implementation requires the user's approval.
+- Work proceeds one PRD phase at a time. The user approved Phase 5 implementation
+  in the Festival wayfinding direction. Phase 6 requires a separate approval.
 
 ## Brand Commitments
 
 The product name is **Gatherly AI**. Use plain-language instructions, labels,
-errors and fallback explanations. The PRD establishes no palette, typography,
-logo or visual world. Those remain undecided for the frontend design work.
+errors and fallback explanations. The user selected Festival wayfinding for the
+frontend; its implemented visual rules are recorded separately in DESIGN.md.
 
 ## Evidence on Hand
 
@@ -104,8 +104,8 @@ logo or visual world. Those remain undecided for the frontend design work.
   [tests/README.md](tests/README.md): test strategy.
 - [SECURITY.md](SECURITY.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): actual
   controls, deployment instructions and known limits.
-- Backend planning and exports are implemented through Phase 4. There is no
-  product frontend, established visual system or supplied brand imagery yet.
+- Backend planning and exports are implemented, with the Phase 5 browser flow.
+  The interface uses an authored vector mark and no supplied photographic assets.
   No testimonials, customer adoption, live deployment proof or accessibility
   conformance results are available to use as claims.
 

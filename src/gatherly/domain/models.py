@@ -100,6 +100,7 @@ class Milestone(DomainModel):
     status: MilestoneStatus
     linked_category: ShortText | None = None
     linked_vendor: ShortText | None = None
+    completed: bool = False
 
 
 class VendorItem(DomainModel):

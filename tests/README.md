@@ -69,3 +69,12 @@ credentials. It checks non-root UID/GID, rejected filesystem writes, runtime
 dependency pins, health, and two bounded concurrent HTTP batches. It runs in CI
 after `make check`; it requires a working Docker daemon. Generated images and
 coverage files are never committed.
+
+Phase 5 adds fixed-asset/CSP/transfer-size API tests and completion-state exports.
+Node unit tests exercise integer money conversion and budget reconciliation.
+Playwright runs actual offline browser flows for all three event types, progress
+round trips, request failures, keyboard operation, safe text and downloads.
+Axe covers all result sections, validation and responsive/light/dark states;
+Lighthouse enforces initial-page accessibility 100 and best practices >=95.
+`make check` includes these browser checks and npm audit. No npm runtime code is
+shipped. See `docs/ACCESSIBILITY.md` for manual assistive-technology checks.

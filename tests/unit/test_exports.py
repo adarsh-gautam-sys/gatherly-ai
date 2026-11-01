@@ -42,9 +42,11 @@ def test_money_formatting_never_rounds_via_float(
 def test_json_export_is_lossless_and_preserves_checklist_status() -> None:
     """The versioned JSON download can be loaded without changing user state."""
     values = sample_plan().model_dump()
+    values["timeline"][0]["completed"] = True
     values["vendors"][0]["status"] = "contacted"
     plan = Plan.model_validate(values)
     assert Plan.model_validate_json(export_json(plan)) == plan
+    assert "- [x]" in export_markdown(plan)
 
 
 def test_markdown_escapes_html_links_structure_and_user_line_breaks() -> None:

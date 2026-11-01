@@ -4,8 +4,8 @@
 
 Gatherly accepts untrusted event text, model output and client-held plans. It has
 no accounts, database, payments, booking integrations or server-side plan files.
-The browser frontend is not implemented yet. This document describes the
-controls present through Phase 4, including container and deployment tooling.
+This document describes the controls present through Phase 5, including the
+browser frontend, container and deployment tooling.
 
 ## Trust boundaries and controls
 
@@ -32,6 +32,13 @@ controls present through Phase 4, including container and deployment tooling.
   Production CSP denies active content; development Swagger uses an exact hash
   for its bootstrap script. HSTS requires a server-recognized HTTPS connection
   or explicit managed-HTTPS configuration by the deployer.
+- The planner document permits only same-origin scripts, styles and API calls.
+  Public assets have a fixed allowlist. User/model text is inserted through
+  `textContent`; scripts, markup and theme colours are never interpreted as HTML
+  or CSS. Imported JSON is bounded and server-validated before rendering.
+- Plans and checklist state stay in browser memory without local storage or
+  analytics. JSON exports are user-controlled files and can contain personal
+  event text; handle those downloads accordingly. No key enters the frontend.
 - Markdown escapes user markup. Calendar values escape control delimiters and
   use UTF-8-safe line folding. Export filenames are fixed. JSON is an attachment
   with `nosniff` and must be treated as untrusted data when imported.
@@ -71,7 +78,8 @@ tools. Local Docker verification uses a read-only filesystem, dropped capabiliti
 and no privilege escalation. Cloud Run has a writable memory-backed filesystem;
 the application does not write event files. Upload/build allowlists exclude local
 secrets. Gemini credentials can be injected from a pinned Secret Manager version
-using a dedicated runtime identity. Frontend output handling is Phase 5.
+using a dedicated runtime identity. The frontend has no third-party runtime
+dependencies; npm packages are isolated browser-test/development tools only.
 
 `make check` runs strict types, tests and coverage, Ruff, Bandit, dependency
 advisory checks and gitleaks. Hooks scan staged content and CI scans Git history.

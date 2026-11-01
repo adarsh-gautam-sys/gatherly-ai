@@ -19,6 +19,7 @@ from gatherly.api.errors import (
 from gatherly.api.health import router as health_router
 from gatherly.api.middleware import RequestGuard
 from gatherly.api.routes import router as plans_router
+from gatherly.api.web import router as web_router
 from gatherly.config import Settings
 from gatherly.infra.runtime import plan_service
 
@@ -50,6 +51,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_exception_handler(HTTPException, http_error_handler)
     app.include_router(health_router)
     app.include_router(plans_router)
+    app.include_router(web_router)
     if config.environment == "development":
         app.include_router(docs_router)
     app.add_middleware(GZipMiddleware, minimum_size=1000)

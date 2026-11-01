@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Plan a wedding, birthday or community event with a clear budget, timeline, vendor checklist and personalised ideas."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>Gatherly AI — Make room for the celebration</title>
+    <link rel="icon" href="/assets/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/style.css" />
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <!-- THESIS: Festival wayfinding gives each planning decision a destination, replacing the generic dashboard of cards.
+OWN-WORLD: Warm paper, forest sign bands, terracotta actions, amber warnings; familiar controls and aligned figures.
+STORY: Enter the event, see the next tasks and exact allocation, then work through the plan.
+FIRST VIEWPORT: A forest event band above a wide grouped form and narrow explanation column; primary action below expandable preferences.
+FORM: Community festival wayfinding, grounded candidate 5; seed 90bd4f92. Signature: budget rows update in place with a brief change highlight; motion is limited to state transitions.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+    <a class="skip" href="#main">Skip to planner</a>
+    <header class="masthead wrap">
+      <a class="brand" href="/"
+        ><img src="/assets/mark.svg" width="34" height="34" alt="" />Gatherly
+        <span>AI</span></a
+      >
+      <p>A little structure. A lot to celebrate.</p>
+    </header>
+    <main id="main" class="wrap" tabindex="-1">
+      <section id="intake" aria-labelledby="welcome">
+        <div class="sign welcome">
+          <h1 id="welcome">Make room for<br />the celebration.</h1>
+          <p>
+            Bring the occasion.<br />
+            Leave with a plan.
+          </p>
+        </div>
+        <div class="intake-layout">
+          <form id="event-form" novalidate>
+            <h2>What are we celebrating?</h2>
+            <p class="muted">
+              Start with the essentials. You can make it yours along the way.
+            </p>
+            <div id="errors" class="notice error" tabindex="-1" hidden>
+              <h3>Check these details</h3>
+              <ul id="error-list"></ul>
+            </div>
+            <fieldset class="event-types">
+              <legend>Occasion</legend>
+              <label
+                ><input
+                  id="occasion-wedding"
+                  type="radio"
+                  name="type"
+                  value="wedding"
+                  required
+                />
+                Wedding</label
+              >
+              <label
+                ><input type="radio" name="type" value="birthday" required />
+                Birthday</label
+              >
+              <label
+                ><input type="radio" name="type" value="community" required />
+                Community</label
+              >
+            </fieldset>
+            <div class="fields">
+              <label class="full"
+                >Event name<input
+                  id="name"
+                  name="name"
+                  required
+                  maxlength="120"
+                  autocomplete="off"
+                  placeholder="e.g. Our neighbourhood gathering"
+              /></label>
+              <label
+                ><span id="date-label">Event date</span
+                ><input
+                  id="date"
+                  name="date"
+                  type="date"
+                  required
+                  aria-describedby="date-hint"
+                  aria-labelledby="date-label"
+                /><small id="date-hint">Choose a future date.</small></label
+              >
+              <label
+                >Number of guests<input
+                  id="guests"
+                  name="guests"
+                  type="number"
+                  min="1"
+                  max="5000"
+                  step="1"
+                  required
+                  inputmode="numeric"
+                  placeholder="e.g. 50"
+              /></label>
+              <label
+                ><span id="budget-label">Total budget</span
+                ><input
+                  id="budget"
+                  name="budget"
+                  inputmode="decimal"
+                  required
+                  aria-describedby="budget-hint"
+                  aria-labelledby="budget-label"
+                  placeholder="e.g. 25000"
+                /><small id="budget-hint"
+                  >Your total, in the selected currency. No live prices.</small
+                ></label
+              >
+              <label
+                >Currency<select id="currency" name="currency">
+                  <option value="INR">INR — Indian rupee</option>
+                  <option value="USD">USD — US dollar</option>
+                  <option value="EUR">EUR — Euro</option>
+                  <option value="GBP">GBP — British pound</option>
+                  <option value="JPY">JPY — Japanese yen</option>
+                </select></label
+              >
+            </div>
+            <details class="preferences">
+              <summary>Make it yours <span>Optional preferences</span></summary>
+              <div class="fields">
+                <label class="full"
+                  >City or region<input
+                    name="region"
+                    maxlength="120"
+                    autocomplete="off"
+                /></label>
+                <label class="full"
+                  >Culture, style and atmosphere<textarea
+                    name="preferences"
+                    maxlength="500"
+                    rows="2"
+                    placeholder="Traditions, colours, indoors or outdoors…"
+                  ></textarea>
+                </label>
+                <label
+                  >Dietary needs<textarea
+                    name="dietary"
+                    maxlength="500"
+                    rows="2"
+                  ></textarea>
+                </label>
+                <label
+                  >Interests<textarea
+                    name="interests"
+                    maxlength="500"
+                    rows="2"
+                  ></textarea>
+                </label>
+                <label class="full"
+                  >Special requests<textarea
+                    name="notes"
+                    maxlength="2000"
+                    rows="3"
+                    placeholder="Anything else we should consider?"
+                  ></textarea>
+                </label>
+              </div>
+            </details>
+            <button class="primary" type="submit" id="create">
+              Create my plan <span aria-hidden="true">→</span>
+            </button>
+            <button type="button" id="cancel-edit" hidden>
+              Return to current plan
+            </button>
+            <p class="privacy">
+              No account. No server-side saved plans. Export a copy to keep your
+              work.
+            </p>
+          </form>
+          <aside class="guide" aria-labelledby="guide-title">
+            <h2 id="guide-title">
+              From “where do I start?”<br />to “we’ve got this.”
+            </h2>
+            <dl>
+              <dt>A budget that adds up</dt>
+              <dd>
+                Every category gets a clear allocation, including a little
+                breathing room.
+              </dd>
+              <dt>The next right thing</dt>
+              <dd>
+                A timeline that works backwards from your day, even when it’s
+                coming up soon.
+              </dd>
+              <dt>People and possibilities</dt>
+              <dd>
+                Vendor questions, personal touches and ideas to bring it all
+                together.
+              </dd>
+            </dl>
+            <div class="guide-note">
+              <p>Your numbers stay grounded.<br />Your ideas get creative.</p>
+              <small
+                >Calculations handle the essentials. Gemini helps with
+                inspiration, with template ideas available when AI is
+                offline.</small
+              >
+            </div>
+          </aside>
+        </div>
+        <div class="import-line">
+          <label for="import"
+            >Already have a Gatherly plan?
+            <span>Open a JSON export</span></label
+          ><input type="file" id="import" accept=".json,application/json" />
+        </div>
+      </section>
+      <section id="results" aria-labelledby="plan-title" hidden>
+        <div class="sign plan-heading">
+          <div>
+            <h1 id="plan-title" tabindex="-1"></h1>
+            <p id="plan-meta"></p>
+          </div>
+          <button type="button" id="edit" class="on-dark">
+            Edit event details
+          </button>
+        </div>
+        <p id="ai-notice" class="notice"></p>
+        <div class="overview">
+          <section aria-labelledby="next-title">
+            <h2 id="next-title">Your next moves</h2>
+            <div id="next-tasks"></div>
+            <p id="completion" class="muted" tabindex="-1"></p>
+          </section>
+          <section class="budget-glance" aria-labelledby="glance-title">
+            <h2 id="glance-title">A plan within your means</h2>
+            <p id="total" class="amount"></p>
+            <p id="per-guest"></p>
+            <p class="muted">Allocated exactly. Contingency included.</p>
+          </section>
+        </div>
+        <div class="plan-tabs" role="tablist" aria-label="Plan sections">
+          <button
+            role="tab"
+            id="tab-budget"
+            aria-controls="panel-budget"
+            aria-selected="true"
+          >
+            Budget</button
+          ><button
+            role="tab"
+            id="tab-timeline"
+            aria-controls="panel-timeline"
+            aria-selected="false"
+            tabindex="-1"
+          >
+            Timeline</button
+          ><button
+            role="tab"
+            id="tab-vendors"
+            aria-controls="panel-vendors"
+            aria-selected="false"
+            tabindex="-1"
+          >
+            Vendors</button
+          ><button
+            role="tab"
+            id="tab-ideas"
+            aria-controls="panel-ideas"
+            aria-selected="false"
+            tabindex="-1"
+          >
+            Ideas
+          </button>
+        </div>
+        <section
+          role="tabpanel"
+          id="panel-budget"
+          aria-labelledby="tab-budget"
+          tabindex="0"
+        >
+          <h2>Give every bit a purpose.</h2>
+          <p>
+            Adjust the total to see your allocation change. No AI call needed.
+          </p>
+          <form id="budget-form" class="budget-controls">
+            <label
+              >Try a new total<input
+                id="what-if"
+                inputmode="decimal"
+                required /></label
+            ><button class="primary" type="submit">Update budget</button
+            ><label class="full"
+              >Explore a budget range<input
+                id="budget-slider"
+                type="range"
+                min="1"
+                max="100000"
+                step="1"
+                aria-describedby="slider-hint"
+              /><small id="slider-hint"
+                >Use arrow keys to adjust, then choose Update budget.</small
+              ></label
+            >
+          </form>
+          <div id="budget-warnings"></div>
+          <div class="table-wrap">
+            <table>
+              <caption>
+                Budget allocation
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Share</th>
+                  <th scope="col">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="budget-lines"></tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row" colspan="2">Total allocation</th>
+                  <td id="budget-sum"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+        <section
+          role="tabpanel"
+          id="panel-timeline"
+          aria-labelledby="tab-timeline"
+          tabindex="0"
+          hidden
+        >
+          <h2>One thing at a time.</h2>
+          <p>
+            Check off tasks as you go. Dates are planning guidance, not booked
+            appointments.
+          </p>
+          <div id="timeline"></div>
+        </section>
+        <section
+          role="tabpanel"
+          id="panel-vendors"
+          aria-labelledby="tab-vendors"
+          tabindex="0"
+          hidden
+        >
+          <h2>Find the right people.</h2>
+          <p>
+            Categories to consider, questions to ask and documents to request.
+            These are allocations, not vendor quotes.
+          </p>
+          <div id="vendors"></div>
+        </section>
+        <section
+          role="tabpanel"
+          id="panel-ideas"
+          aria-labelledby="tab-ideas"
+          tabindex="0"
+          hidden
+        >
+          <h2>Make it feel like you.</h2>
+          <p id="concept"></p>
+          <div id="ideas"></div>
+          <button type="button" id="refresh">Refresh ideas</button>
+          <form id="refine-form">
+            <h3>A little more you</h3>
+            <label
+              >What would you like to change?<textarea
+                id="instruction"
+                required
+                maxlength="2000"
+                rows="3"
+                placeholder="e.g. Make the menu vegetarian and reuse decorations"
+              ></textarea></label
+            ><label
+              >Refine which part?<select id="refine-section">
+                <option value="all">All creative ideas</option>
+                <option value="themes">Themes</option>
+                <option value="menu">Menu</option>
+                <option value="activities">Activities</option>
+                <option value="personal_touches">Personal touches</option>
+                <option value="saving_tips">Saving tips</option>
+              </select></label
+            >
+            <p class="muted">
+              To change spending, use the Budget tab first. Amounts are never
+              inferred from instructions.
+            </p>
+            <button class="primary" type="submit">Refine my ideas</button>
+          </form>
+        </section>
+        <section class="exports" aria-labelledby="export-title">
+          <div>
+            <h2 id="export-title">Take your plan with you.</h2>
+            <p>Keep a JSON copy to reopen your plan and checklist progress.</p>
+          </div>
+          <div class="export-actions">
+            <button data-export="md">Markdown</button
+            ><button data-export="json">JSON</button
+            ><button data-export="ics">Calendar</button
+            ><button id="print">Print / PDF</button>
+          </div>
+        </section>
+      </section>
+      <div
+        id="feedback"
+        class="notice error"
+        tabindex="-1"
+        role="alert"
+        hidden
+      ></div>
+      <p id="status" role="status" aria-live="polite" class="status"></p>
+      <noscript
+        ><p class="notice">
+          This planner needs JavaScript to generate and update your plan. Enable
+          JavaScript, then reload this page.
+        </p></noscript
+      >
+    </main>
+    <footer class="wrap">
+      <p>Gatherly AI <span>Good plans bring people together.</span></p>
+      <p>
+        Planning guidance, not bookings or live prices. Verify local permits and
+        safety needs.
+      </p>
+    </footer>
+  </body>
+</html>

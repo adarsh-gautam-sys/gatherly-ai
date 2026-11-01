@@ -35,5 +35,12 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Local browser verification and design workflow state
+test-results/
+playwright-report/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/mocks/
+
 # Original supplied document is preserved locally; canonical copy is docs/PRD.md.
 /Gatherly AI Product Requirements Document.md

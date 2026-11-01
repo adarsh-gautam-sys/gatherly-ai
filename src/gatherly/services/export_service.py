@@ -116,7 +116,8 @@ def export_markdown(plan: Plan) -> str:
     lines.extend(_budget_markdown(plan))
     lines.extend(["", "## Timeline", ""])
     lines.extend(
-        f"- {item.due_date.isoformat()} — {_markdown(item.title)} "
+        f"- [{'x' if item.completed else ' '}] {item.due_date.isoformat()} "
+        f"— {_markdown(item.title)} "
         f"({item.phase}; {item.status}; priority {item.priority})"
         for item in plan.timeline
     )

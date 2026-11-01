@@ -3,8 +3,8 @@
 Turn a few event details into a realistic celebration plan, with deterministic
 budgets, timelines and checklists plus creative ideas from Gemini.
 
-**Phase 4 hardening implemented.** CI and coverage badges will be linked when the
-GitHub repository exists. A screenshot will be added after the Phase 5 frontend.
+**Phase 5 frontend implemented.** CI and coverage badges will be linked when the
+GitHub repository exists. Final submission screenshots are Phase 6.
 The source of truth is [the PRD](docs/PRD.md).
 
 ## Chosen Vertical
@@ -93,8 +93,11 @@ offline HTTP requests. See [Phase 4 evidence](docs/PHASE_4.md).
 
 ## Accessibility
 
-The frontend and accessibility checks are scheduled for Phase 5. No accessibility
-conformance claim is made for this backend foundation.
+The frontend supports labelled forms, keyboard tabs, native checklists, error
+focus, live announcements, light/dark preferences, reduced motion and print.
+Axe reports zero violations in tested states; Lighthouse accessibility is 100.
+See [verification scope and manual checks](docs/ACCESSIBILITY.md). Full WCAG
+conformance is not claimed from automated scores alone.
 
 ## Quick start
 
@@ -102,6 +105,8 @@ Install Python **3.12**, Git, GNU Make and
 [gitleaks **8.30.1**](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1).
 Put `gitleaks` on PATH (Windows also supports `.tools/gitleaks/gitleaks.exe`).
 All Python dependencies are isolated in `.venv`.
+Install Node **22.19+** for browser verification. `make install` installs the
+locked npm development tools and Chromium; there is no frontend build step.
 
 ```sh
 make install
@@ -113,7 +118,9 @@ On Windows use PowerShell with these same commands (`make install` uses
 `py -3.12`). On Unix it uses `python3.12`. Override `PYTHON` when necessary:
 `make install PYTHON=/path/to/python3.12`.
 
-Open [the health endpoint](http://127.0.0.1:8000/health).
+Open [Gatherly AI](http://127.0.0.1:8000/) or [the health endpoint](http://127.0.0.1:8000/health).
+Generate a plan, track tasks/vendors, try a new budget and refine ideas. Export
+JSON before reloading to keep your plan; reopen it using the intake file control.
 Copy `.env.example` to `.env` only if local overrides are needed. To enable
 documentation, set `GATHERLY_ENVIRONMENT=development` in that file and restart.
 The only supported values are `development` and `production` (the default).
@@ -159,7 +166,7 @@ tests/
   live/             optional Gemini smoke test, disabled in CI
 ```
 
-The Dockerfile and Cloud Run script are implemented. The frontend remains Phase 5.
+The Dockerfile includes the frontend; no Node runtime is needed in production.
 
 ## Development commands
 
@@ -173,6 +180,7 @@ The Dockerfile and Cloud Run script are implemented. The frontend remains Phase 
 - `make image`: build the pinned runtime image (requires Docker).
 - `make container-test`: build and verify non-root/read-only operation and HTTP load.
 - `make load`: check the local development budget endpoint with synthetic requests.
+- `make web-check`: formatting, exact money tests, browser flows, axe and Lighthouse.
 
 Stage intended changes before `make check` so the secret scanner includes new
 files. The pre-commit hook checks staged content; CI also scans Git history.
@@ -189,6 +197,6 @@ all checks on the new lock. Never commit virtualenvs, binaries or test reports.
 The API accepts explicit affected sections and an integer budget override for
 refinement; money is never inferred by the model. Rate counters and caches are
 process-local; deployments with multiple workers need perimeter controls.
-The frontend remains Phase 5 and starts only after approval.
+Phase 6 documentation/submission work starts only after approval.
 Live model quality and latency need a configured key; hosted CI and repository
 visibility need a GitHub remote.

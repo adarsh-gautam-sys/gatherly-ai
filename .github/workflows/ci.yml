@@ -33,6 +33,8 @@ jobs:
           echo "$RUNNER_TEMP/gitleaks-bin" >> "$GITHUB_PATH"
       - name: Install locked dependencies
         run: make install
+      - name: Install Chromium system dependencies
+        run: npx playwright install-deps chromium
       - name: Lint, strict types, coverage and security scans
         run: make check
       - name: Verify non-root, read-only container and offline load
