@@ -85,8 +85,8 @@ branch and format rules remain unverified; do not invent compliance claims.
   Preserve strict validation, safe errors, request limits and privacy controls.
 - No real booking, payments, accounts, native apps, image-generation product
   feature or additional event types. Stretch work waits until the PRD is complete.
-- Work proceeds one PRD phase at a time. The user approved Phase 5 implementation
-  in the Festival wayfinding direction. Phase 6 requires a separate approval.
+- Work proceeds one PRD phase at a time. The user approved Phase 6
+  documentation, architecture and final submission self-audit.
 
 ## Brand Commitments
 

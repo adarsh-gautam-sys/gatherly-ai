@@ -4,7 +4,7 @@
 
 Gatherly accepts untrusted event text, model output and client-held plans. It has
 no accounts, database, payments, booking integrations or server-side plan files.
-This document describes the controls present through Phase 5, including the
+This document describes the controls present through Phase 6, including the
 browser frontend, container and deployment tooling.
 
 ## Trust boundaries and controls
