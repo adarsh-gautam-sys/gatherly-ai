@@ -98,7 +98,7 @@ def test_gemini_aliases_limits_and_secret_redaction(
     [
         ("GATHERLY_AI_CONCURRENCY", "0"),
         ("GATHERLY_AI_CONCURRENCY", "17"),
-        ("GATHERLY_AI_TIMEOUT_SECONDS", "7"),
+        ("GATHERLY_AI_TIMEOUT_SECONDS", "46"),
         ("GATHERLY_CACHE_CAPACITY", "1025"),
         ("GATHERLY_CACHE_TTL_SECONDS", "3601"),
         ("GEMINI_MODEL", "https://example.com"),
@@ -159,7 +159,7 @@ def test_invalid_cors_configuration_is_rejected(
     ("name", "value"),
     [
         ("GATHERLY_MAX_BODY_BYTES", "0"),
-        ("GATHERLY_REQUEST_TIMEOUT_SECONDS", "15"),
+        ("GATHERLY_REQUEST_TIMEOUT_SECONDS", "91"),
         ("GATHERLY_REQUESTS_PER_MINUTE", "0"),
         ("GATHERLY_RATE_LIMIT_CAPACITY", "0"),
     ],

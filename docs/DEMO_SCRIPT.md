@@ -120,3 +120,4 @@ This script provides an interactive 3–5 minute demonstration of **Gatherly AI*
 > - **98.94% overall automated test coverage**, with 100.00% domain coverage.
 > - **WCAG 2.2 AA compliant** with 0 axe-core violations and Lighthouse Accessibility 100.
 > - **Production containerized** as a read-only, non-root microservice ready for Google Cloud Run."*
+

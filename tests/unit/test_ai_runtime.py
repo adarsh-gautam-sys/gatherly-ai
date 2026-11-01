@@ -72,7 +72,7 @@ def test_runtime_injects_timeouts_disables_sdk_retries_and_closes_clients(
             else:
                 await run()
             options = factory.call_args.kwargs["http_options"]
-            assert options.timeout == 6000
+            assert options.timeout == 20000
             assert options.retry_options.attempts == 1
             assert factory.call_args.kwargs["vertexai"] is False
             client.aio.aclose.assert_awaited_once()

@@ -6,6 +6,7 @@ import json
 import httpx
 from google import genai
 from google.genai import errors, types
+from google.genai._transformers import t_schema
 
 from gatherly.domain.ideas import Ideas, IdeasResponse, RefinementResponse
 from gatherly.infra.prompts import Prompts, build_message
@@ -21,6 +22,16 @@ _SAFETY_CATEGORIES = (
     types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
     types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
 )
+
+
+def _clean_schema(schema: types.Schema) -> types.Schema:
+    schema.additional_properties = None
+    if schema.properties:
+        for prop in schema.properties.values():
+            _clean_schema(prop)
+    if schema.items:
+        _clean_schema(schema.items)
+    return schema
 
 
 def _response_text(response: types.GenerateContentResponse) -> str:
@@ -67,11 +78,15 @@ class GeminiIdeasGenerator:
     async def generate(self, task: IdeaTask) -> Ideas:
         """Make one structured call and strictly validate the returned JSON."""
         refining = task.current is not None
+        raw_schema = t_schema(None, RefinementResponse if refining else IdeasResponse)
+        if raw_schema is None:
+            raise IdeasUnavailable()
+        schema = _clean_schema(raw_schema)
         config = types.GenerateContentConfig(
             system_instruction=self._prompts.system
             + ("\n" + self._prompts.refinement if refining else ""),
             response_mime_type="application/json",
-            response_schema=RefinementResponse if refining else IdeasResponse,
+            response_schema=schema,
             temperature=REFINEMENT_TEMPERATURE if refining else IDEAS_TEMPERATURE,
             max_output_tokens=MAX_OUTPUT_TOKENS,
             candidate_count=1,

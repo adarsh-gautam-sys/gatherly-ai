@@ -94,3 +94,4 @@ To update dependencies:
 1. Update version pin in `pyproject.toml`.
 2. Re-resolve in a clean virtual environment and freeze to `requirements.txt`.
 3. Verify that `pip-audit`, `npm audit`, and all test suites pass.
+

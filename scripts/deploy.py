@@ -73,7 +73,7 @@ def deployment_command(
         "--concurrency=16",
         "--max-instances=1",
         "--min-instances=0",
-        "--timeout=20s",
+        "--timeout=60s",
         "--ingress=all",
         "--invoker-iam-check",
         "--set-env-vars=GATHERLY_ENVIRONMENT=production,GATHERLY_EXTERNAL_HTTPS=true",

@@ -35,12 +35,12 @@ class Settings(BaseSettings):
         max_length=100,
         pattern=r"^gemini-[a-z0-9.-]+$",
     )
-    ai_timeout_seconds: int = Field(default=6, ge=1, le=6)
+    ai_timeout_seconds: int = Field(default=20, ge=1, le=45)
     ai_concurrency: int = Field(default=4, ge=1, le=16)
     cache_capacity: int = Field(default=128, ge=1, le=1024)
     cache_ttl_seconds: int = Field(default=300, ge=1, le=3600)
     max_body_bytes: int = Field(default=262_144, ge=1024, le=1_048_576)
-    request_timeout_seconds: int = Field(default=14, ge=1, le=14)
+    request_timeout_seconds: int = Field(default=30, ge=1, le=90)
     requests_per_minute: int = Field(default=60, ge=1, le=600)
     rate_limit_capacity: int = Field(default=4096, ge=1, le=65_536)
     allowed_origins: tuple[str, ...] = ()
