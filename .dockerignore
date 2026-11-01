@@ -1,0 +1,17 @@
+# Allow only application build inputs; local secrets and tools never enter context.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!requirements.txt
+!README.md
+!LICENSE
+!src/
+!src/**
+!prompts/
+!prompts/**
+**/__pycache__/**
+**/*.pyc
+**/.env*
+**/*.pem
+**/*.key

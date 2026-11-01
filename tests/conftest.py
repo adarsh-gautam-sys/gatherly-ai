@@ -14,5 +14,6 @@ def isolated_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         if name.startswith("GATHERLY_") and name != "GATHERLY_RUN_LIVE_TEST":
             monkeypatch.delenv(name)
     monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    monkeypatch.delenv("PORT", raising=False)
     if os.getenv("GATHERLY_RUN_LIVE_TEST") != "1" or os.getenv("CI"):
         monkeypatch.delenv("GEMINI_API_KEY", raising=False)

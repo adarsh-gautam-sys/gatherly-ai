@@ -6,7 +6,7 @@ documentation restrictions, development configuration and settings validation.
 No network calls or credentials are needed by the tests.
 
 `make test` measures statements and branches across the complete `gatherly`
-package. Coverage below 90% fails. `make check` also runs Ruff, strict mypy,
+package and deployment/load scripts. Coverage below 90% fails. `make check` also runs Ruff, strict mypy,
 Bandit, dependency auditing and Git secret scans. Scanners require network access
 for current advisories; tests do not. Stage intended changes before `make check`
 so the staged secret scan includes new files.
@@ -58,3 +58,14 @@ Import tests reject inconsistent budgets, vendor allocations and timeline task
 identities before export or refinement. Export tests check integer currency
 formatting, Markdown escaping, calendar property injection, UTF-8-safe 75-octet
 folding, stable milestone UIDs, and the last representable calendar date.
+
+Phase 4 verifies platform settings, managed TLS without client-IP spoofing,
+safe deployment previews, invalid resource identifiers, CLI login preflight,
+load target and resource bounds, incorrect budget detection, and disposable
+container cleanup after failure. CLI operations are mocked in unit tests.
+
+`make container-test` additionally builds and runs the actual Linux image without
+credentials. It checks non-root UID/GID, rejected filesystem writes, runtime
+dependency pins, health, and two bounded concurrent HTTP batches. It runs in CI
+after `make check`; it requires a working Docker daemon. Generated images and
+coverage files are never committed.

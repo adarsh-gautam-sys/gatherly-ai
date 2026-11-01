@@ -9,8 +9,9 @@ VENV_PYTHON := .venv/bin/python
 endif
 
 GITLEAKS ?= $(if $(wildcard .tools/gitleaks/gitleaks.exe),.tools/gitleaks/gitleaks.exe,gitleaks)
+IMAGE ?= gatherly-ai:local
 
-.PHONY: install lint typecheck test scan scan-staged check run
+.PHONY: install lint typecheck test scan scan-staged check run image container-test load
 
 install:
 	$(PYTHON) -m venv .venv
@@ -19,8 +20,8 @@ install:
 	"$(VENV_PYTHON)" -m pre_commit install
 
 lint:
-	"$(VENV_PYTHON)" -m ruff check src tests
-	"$(VENV_PYTHON)" -m ruff format --check src tests
+	"$(VENV_PYTHON)" -m ruff check src tests scripts
+	"$(VENV_PYTHON)" -m ruff format --check src tests scripts
 
 typecheck:
 	"$(VENV_PYTHON)" -m mypy
@@ -30,7 +31,7 @@ test:
 	"$(VENV_PYTHON)" -m coverage report --include="src/gatherly/domain/*" --fail-under=100
 
 scan:
-	"$(VENV_PYTHON)" -m bandit -q -r src
+	"$(VENV_PYTHON)" -m bandit -q -r src scripts
 	"$(VENV_PYTHON)" -m pip_audit --strict --no-deps --disable-pip -r requirements.txt
 	$(GITLEAKS) git --redact --no-banner
 	$(MAKE) scan-staged
@@ -42,3 +43,12 @@ check: lint typecheck test scan
 
 run:
 	"$(VENV_PYTHON)" -m uvicorn gatherly.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log --no-proxy-headers
+
+image:
+	docker build --tag "$(IMAGE)" .
+
+container-test: image
+	"$(VENV_PYTHON)" -m scripts.check_container --image "$(IMAGE)"
+
+load:
+	"$(VENV_PYTHON)" -m scripts.load_sanity

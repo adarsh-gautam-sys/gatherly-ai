@@ -53,7 +53,7 @@ convention = "pep257"
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["src", "tests"]
+files = ["src", "tests", "scripts"]
 plugins = ["pydantic.mypy"]
 
 [tool.pydantic-mypy]
@@ -63,13 +63,13 @@ warn_required_dynamic_aliases = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--strict-config --strict-markers --import-mode=importlib --cov=gatherly --cov-report=term-missing --cov-report=xml"
+addopts = "--strict-config --strict-markers --import-mode=importlib --cov=gatherly --cov=scripts --cov-report=term-missing --cov-report=xml"
 filterwarnings = ["error"]
 markers = ["live: opt-in Gemini API smoke test (requires GEMINI_API_KEY)"]
 
 [tool.coverage.run]
 branch = true
-source = ["gatherly"]
+source = ["gatherly", "scripts"]
 relative_files = true
 
 [tool.coverage.report]

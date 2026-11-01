@@ -142,9 +142,10 @@ All errors use `code`, `message` and `details`. For example:
 
 Responses carry a server-generated `X-Request-ID`, `Cache-Control: no-store`,
 `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and CSP. HSTS is
-added only when the ASGI server identifies the connection as HTTPS. Application
-logs contain IDs and elapsed milliseconds only. Forwarded headers are ignored
-by `make run`; an HTTPS deployment must configure its trusted proxy explicitly.
+added for server-recognized HTTPS or explicitly configured managed HTTPS ingress.
+Application logs contain IDs and elapsed milliseconds only. Forwarded headers
+are ignored by both `make run` and the container. Cloud Run limits requests by
+proxy peer; see [deployment constraints](DEPLOYMENT.md).
 
 ## Settings
 
@@ -155,6 +156,8 @@ by `make run`; an HTTPS deployment must configure its trusted proxy explicitly.
 | `GATHERLY_REQUESTS_PER_MINUTE` | 60 | 1–600; all `/api/` requests, including preflight |
 | `GATHERLY_RATE_LIMIT_CAPACITY` | 4096 | 1–65536 active client counters |
 | `GATHERLY_ALLOWED_ORIGINS` | `[]` | JSON list of at most ten exact HTTP(S) origins |
+| `PORT` | 8080 | Container listener; integer 1024–65535 |
+| `GATHERLY_EXTERNAL_HTTPS` | false | Enable only when ingress guarantees HTTPS |
 
 Same-origin access is permitted without extra configuration. Cross-origin
 credentials are never enabled. Preflight permits GET/POST and Content-Type/Accept

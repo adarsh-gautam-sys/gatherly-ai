@@ -122,6 +122,9 @@ class RequestGuard:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
+        if self.settings.external_https:
+            # Explicit deployment contract: TLS terminates at the managed ingress.
+            scope = dict(scope, scheme="https")
         request_id = uuid4().hex
         started = monotonic()
         sent = False

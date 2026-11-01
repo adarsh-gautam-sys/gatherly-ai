@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     requests_per_minute: int = Field(default=60, ge=1, le=600)
     rate_limit_capacity: int = Field(default=4096, ge=1, le=65_536)
     allowed_origins: tuple[str, ...] = ()
+    port: int = Field(default=8080, validation_alias="PORT", ge=1024, le=65535)
+    external_https: bool = False
 
     @field_validator("allowed_origins", mode="before")
     @classmethod

@@ -3,7 +3,7 @@
 Turn a few event details into a realistic celebration plan, with deterministic
 budgets, timelines and checklists plus creative ideas from Gemini.
 
-**Phase 3 API and exports implemented.** CI and coverage badges will be linked when the
+**Phase 4 hardening implemented.** CI and coverage badges will be linked when the
 GitHub repository exists. A screenshot will be added after the Phase 5 frontend.
 The source of truth is [the PRD](docs/PRD.md).
 
@@ -88,6 +88,8 @@ Run `make check` for lint, formatting, strict types, tests and scans. Tests enfo
 90% overall coverage and 100% domain statement/branch coverage. Hypothesis checks
 budget and timeline invariants. See [the test strategy](tests/README.md).
 CI runs the same command on pushes and pull requests; advisories require network.
+It also builds and verifies the non-root, read-only container with concurrent
+offline HTTP requests. See [Phase 4 evidence](docs/PHASE_4.md).
 
 ## Accessibility
 
@@ -126,9 +128,14 @@ names; [Phase 2 notes](docs/PHASE_2.md) describe limits and the opt-in live test
 HTTP defaults are a 256 KiB body limit, 14-second deadline and 60 API requests per
 minute per client address. Cross-origin access requires an explicit allowlist;
 same-origin access works by default. See [HTTP settings](docs/API.md#settings).
-`make run` ignores forwarded headers; deployment proxy trust is configured separately.
+`make run` and the container ignore forwarded headers. Cloud Run uses an explicit
+HTTPS setting; rate limits behind its proxy share the immediate peer's bucket.
 
-Docker and Cloud Run instructions will be added in Phase 4.
+For Docker, install a Linux engine and run `make container-test`. To deploy to
+Cloud Run, follow the [preview/deploy command and prerequisites](docs/DEPLOYMENT.md).
+Deployment defaults to private invocation, one instance and fallback mode.
+`PORT` configures the container listener; `GATHERLY_EXTERNAL_HTTPS` is enabled
+only behind managed HTTPS ingress. Never enable it for plain local HTTP.
 
 ## Project structure
 
@@ -143,6 +150,7 @@ src/gatherly/
   domain/           models, budget, timeline, vendors and immutable templates
   infra/            Gemini, clock, prompts, cache, rate limiter and composition
 prompts/            packaged, versioned system and refinement policies
+scripts/            Cloud Run deployment, local load and container verification
 tests/
   api/              planning contracts, exports, health and OpenAPI tests
   unit/             settings, domain, template and architecture tests
@@ -151,17 +159,20 @@ tests/
   live/             optional Gemini smoke test, disabled in CI
 ```
 
-Deployment files and the frontend will be created in their assigned phases.
+The Dockerfile and Cloud Run script are implemented. The frontend remains Phase 5.
 
 ## Development commands
 
 - `make install`: create `.venv`, install locked dependencies and editable app,
   then install pre-commit hooks.
 - `make lint`: Ruff lint and format verification.
-- `make typecheck`: strict mypy on source and tests.
+- `make typecheck`: strict mypy on source, scripts and tests.
 - `make test`: pytest with the 90% overall and 100% domain coverage gates.
 - `make check`: all checks, including static, dependency and Git secret scans.
 - `make run`: serve on `127.0.0.1:8000` without access logging or proxy-header trust.
+- `make image`: build the pinned runtime image (requires Docker).
+- `make container-test`: build and verify non-root/read-only operation and HTTP load.
+- `make load`: check the local development budget endpoint with synthetic requests.
 
 Stage intended changes before `make check` so the secret scanner includes new
 files. The pre-commit hook checks staged content; CI also scans Git history.
@@ -178,6 +189,6 @@ all checks on the new lock. Never commit virtualenvs, binaries or test reports.
 The API accepts explicit affected sections and an integer budget override for
 refinement; money is never inferred by the model. Rate counters and caches are
 process-local; deployments with multiple workers need perimeter controls.
-Phase 4 deployment hardening starts after approval; the frontend remains Phase 5.
+The frontend remains Phase 5 and starts only after approval.
 Live model quality and latency need a configured key; hosted CI and repository
 visibility need a GitHub remote.

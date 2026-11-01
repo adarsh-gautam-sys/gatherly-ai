@@ -1,0 +1,18 @@
+# Source deployment uses the same narrow inputs as the Docker build.
+**
+!.gcloudignore
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!requirements.txt
+!README.md
+!LICENSE
+!src/
+!src/**
+!prompts/
+!prompts/**
+**/__pycache__/**
+**/*.pyc
+**/.env*
+**/*.pem
+**/*.key
