@@ -22,6 +22,7 @@ dev = [
     "editables==0.6",
     "hatchling==1.33.0",
     "httpx2==2.16.0",
+    "hypothesis==6.170.14",
     "mypy==2.4.1",
     "pip-audit==2.10.1",
     "pre-commit==4.7.0",

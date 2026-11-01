@@ -21,6 +21,7 @@ h11==0.16.0
 hatchling==1.33.0
 httpcore2==2.16.0
 httpx2==2.16.0
+hypothesis==6.170.14
 identify==2.6.20
 idna==3.20
 iniconfig==2.3.1

@@ -3,7 +3,7 @@
 Turn a few event details into a realistic celebration plan, with deterministic
 budgets, timelines and checklists plus creative ideas from Gemini.
 
-**Phase 0 foundation only.** CI and coverage badges will be linked when the
+**Phase 1 domain core implemented.** CI and coverage badges will be linked when the
 GitHub repository exists. A screenshot will be added after the Phase 5 frontend.
 The source of truth is [the PRD](docs/PRD.md).
 
@@ -23,7 +23,8 @@ flowchart LR
     Services --> Infra[Injected infrastructure adapters]
 ```
 
-These planning components are reserved for later PRD phases.
+The deterministic domain engines are implemented. Service orchestration and
+Gemini integration arrive in Phase 2; planning endpoints arrive in Phase 3.
 
 ## How the Solution Works
 
@@ -31,20 +32,26 @@ The application factory loads validated settings and registers a health router.
 `GET /health` returns `{"status":"ok","version":"0.1.0"}` without network I/O.
 The package version is also used in development OpenAPI documentation.
 API docs are disabled by default. No planning endpoints are implemented yet.
+Pure Python domain functions generate budgets, chronological milestones with
+phase labels, and vendor checklists. See the [domain example and policies](docs/PHASE_1.md).
 
 ## Assumptions
 
 - Python 3.12 and Git are installed; GNU Make is available on PATH.
 - The server is stateless; no database, accounts or stored personal data.
-- Phase 0 needs no Gemini key. SDK, model selection and fallback arrive in Phase 2.
+- The current implementation needs no Gemini key. Integration arrives in Phase 2.
 - Central settings live in `config.py`, matching PRD section 11. Domain packages
   remain free of I/O. Later service adapters will use dependency injection.
 - See [Phase 0 verification notes](docs/PHASE_0.md) for submission-rule uncertainty.
+- Money is integer minor units in INR, USD, EUR, GBP or JPY. Numerical heuristics,
+  bounds and timeline interpretation are documented in [Phase 1](docs/PHASE_1.md).
 
 ## Features mapped to the problem statement
 
-Budgets, timelines and vendor checklists are planned for Phase 1; personalized
-ideas for Phase 2. Only liveness and central configuration ship in Phase 0.
+Budgets use exact integer allocation, guest-aware food shares and contingency.
+Timelines compress when lead time is short and mark missed deadlines due now.
+Vendor checklists link allocations to questions, documents and booking guidance.
+All three event types are covered. Personalized ideas arrive in Phase 2.
 
 ## Security
 
@@ -57,12 +64,14 @@ gitleaks. The complete threat model and API protections arrive in later phases.
 ## Efficiency
 
 The health endpoint has no external calls. No frontend, database or AI dependency
-is installed in Phase 0. Caching and model-call controls arrive in Phase 2.
+is installed. Domain engines use small fixed templates and no external calls.
+Caching and model-call controls arrive in Phase 2.
 
 ## Testing
 
 Run `make check` for lint, formatting, strict types, tests and scans. Tests enforce
-90% combined statement/branch coverage. See [the test strategy](tests/README.md).
+90% overall coverage and 100% domain statement/branch coverage. Hypothesis checks
+budget and timeline invariants. See [the test strategy](tests/README.md).
 CI runs the same command on pushes and pull requests; advisories require network.
 
 ## Accessibility
@@ -105,11 +114,12 @@ src/gatherly/
   config.py         environment and dotenv settings
   api/              health route and response schema
   services/         empty orchestration package
-  domain/           empty pure-logic package
+  domain/           models, budget, timeline, vendors and immutable templates
   infra/            empty adapter package
 tests/
   api/              health and documentation tests
-  unit/             settings tests
+  unit/             settings, domain, template and architecture tests
+  property/         generated budget and timeline invariants
 ```
 
 Prompt files, the frontend, future test suites and deployment files will be
@@ -121,7 +131,7 @@ created in their assigned phases.
   then install pre-commit hooks.
 - `make lint`: Ruff lint and format verification.
 - `make typecheck`: strict mypy on source and tests.
-- `make test`: pytest with coverage and the 90% gate.
+- `make test`: pytest with the 90% overall and 100% domain coverage gates.
 - `make check`: all checks, including static, dependency and Git secret scans.
 - `make run`: serve on `127.0.0.1:8000` without access logging.
 
@@ -137,6 +147,6 @@ all checks on the new lock. Never commit virtualenvs, binaries or test reports.
 
 ## Limitations and future work
 
-This foundation does not produce event plans. Follow PRD section 12 one phase
-at a time; Phase 1 starts only after explicit approval. Hosted CI and repository
+The domain engines produce deterministic planning components; full plans and AI
+are not yet integrated. Phase 2 starts only after explicit approval. Hosted CI and repository
 visibility cannot be verified until a GitHub remote is configured.
