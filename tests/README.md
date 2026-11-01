@@ -40,3 +40,21 @@ The optional `live` test uses synthetic data and real credentials only when
 `GEMINI_API_KEY` in the environment and `python -m pytest tests/live -m live --no-cov`
 using the project virtualenv. It is excluded from normal offline verification.
 Accessibility tests arrive with the Phase 5 frontend.
+
+Phase 3 exercises every HTTP route using FastAPI TestClient and injected offline
+services. Tests verify strict JSON dates/arrays without numeric coercion,
+fallback responses, cache-bypassing creative refresh, budget-first refinement,
+lossless JSON export, safe download names and resolvable OpenAPI references.
+Default-lifespan tests also cover the production composition without overrides.
+
+HTTP security tests cover success and error headers, exact CORS matching,
+rate-limit exhaustion, untrusted forwarding headers, non-JSON/compressed bodies,
+oversized and underreported bodies, duplicate length headers, disconnects and
+slow uploads. Direct ASGI tests deliver individual body chunks. Request deadline
+tests prove cancellation and verify generic 503 responses. Logs are inspected for
+request IDs and durations only, with no user content or exception text.
+
+Import tests reject inconsistent budgets, vendor allocations and timeline task
+identities before export or refinement. Export tests check integer currency
+formatting, Markdown escaping, calendar property injection, UTF-8-safe 75-octet
+folding, stable milestone UIDs, and the last representable calendar date.

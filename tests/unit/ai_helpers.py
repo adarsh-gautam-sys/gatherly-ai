@@ -1,10 +1,13 @@
 """Deterministic fakes for creative service tests."""
 
+import asyncio
 from datetime import UTC, datetime
 
 from gatherly.domain.budget import build_budget
 from gatherly.domain.fallback import fallback_ideas
-from gatherly.domain.ideas import Ideas
+from gatherly.domain.ideas import Ideas, Plan
+from gatherly.infra.cache import MemoryIdeasCache
+from gatherly.services.plan_service import PlanService
 from gatherly.services.ports import IdeasUnavailable, IdeaTask
 from tests.unit.domain_helpers import event_request
 
@@ -15,6 +18,12 @@ class FixedClock:
     def now(self) -> datetime:
         """Return a timezone-aware instant before the example event."""
         return datetime(2028, 1, 1, tzinfo=UTC)
+
+
+def sample_plan() -> Plan:
+    """Create a fixed offline plan for export and import boundary tests."""
+    service = PlanService(None, MemoryIdeasCache(1, 10), FixedClock(), "export")
+    return asyncio.run(service.create(event_request()))
 
 
 def idea_task() -> IdeaTask:

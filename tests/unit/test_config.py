@@ -113,3 +113,61 @@ def test_invalid_ai_configuration_is_rejected(
     monkeypatch.setenv(name, value)
     with pytest.raises(ValidationError):
         Settings()
+
+
+def test_allowed_origins_load_from_json_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An explicit origin list is immutable and accepts local development ports."""
+    monkeypatch.setenv(
+        "GATHERLY_ALLOWED_ORIGINS",
+        '["https://planner.example","http://localhost:8080"]',
+    )
+    assert Settings().allowed_origins == (
+        "https://planner.example",
+        "http://localhost:8080",
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        '"https://example.com"',
+        "[123]",
+        '["*"]',
+        '["https://example.com/path"]',
+        '["https://user:password@example.com"]',
+        '["https://example.com?x=1"]',
+        '["https://example.com#fragment"]',
+        '["file://example.com"]',
+        '["https://"]',
+        '["https://bad host"]',
+        '["https://example.com/"]',
+        "[" + ",".join(['"https://example.com"'] * 11) + "]",
+    ],
+)
+def test_invalid_cors_configuration_is_rejected(
+    monkeypatch: pytest.MonkeyPatch, value: str
+) -> None:
+    """Origin configuration cannot weaken policy through wildcards or URL components."""
+    monkeypatch.setenv("GATHERLY_ALLOWED_ORIGINS", value)
+    with pytest.raises(ValidationError):
+        Settings()
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("GATHERLY_MAX_BODY_BYTES", "0"),
+        ("GATHERLY_REQUEST_TIMEOUT_SECONDS", "15"),
+        ("GATHERLY_REQUESTS_PER_MINUTE", "0"),
+        ("GATHERLY_RATE_LIMIT_CAPACITY", "0"),
+    ],
+)
+def test_invalid_http_limits_are_rejected(
+    monkeypatch: pytest.MonkeyPatch, name: str, value: str
+) -> None:
+    """Deployment settings cannot silently remove HTTP resource bounds."""
+    monkeypatch.setenv(name, value)
+    with pytest.raises(ValidationError):
+        Settings()

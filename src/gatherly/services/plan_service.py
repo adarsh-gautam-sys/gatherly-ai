@@ -11,6 +11,7 @@ from gatherly.domain.models import EventRequest, VendorItem
 from gatherly.domain.timeline import build_timeline
 from gatherly.domain.vendors import build_vendors
 from gatherly.services.idea_validation import sanitise_ideas
+from gatherly.services.plan_validation import validate_saved_plan
 from gatherly.services.ports import (
     Clock,
     IdeasCache,
@@ -63,6 +64,7 @@ class PlanService:
 
     async def refine(self, plan: Plan, change: Refinement) -> Plan:
         """Apply explicit budget changes deterministically and refine selected ideas."""
+        validate_saved_plan(plan)
         now = self._clock.now()
         values = plan.request.model_dump()
         if change.budget is not None:
@@ -106,14 +108,23 @@ class PlanService:
             generated_at=now,
         )
 
-    async def _ideas(self, task: IdeaTask) -> tuple[Ideas, bool]:
+    async def regenerate_ideas(self, event: EventRequest) -> tuple[Ideas, bool]:
+        """Refresh only creative content, bypassing an earlier cached generation."""
+        event.validate_future_date(self._clock.now().date())
+        return await self._ideas(
+            IdeaTask(event=event, budget=build_budget(event)), use_cache=False
+        )
+
+    async def _ideas(
+        self, task: IdeaTask, *, use_cache: bool = True
+    ) -> tuple[Ideas, bool]:
         key = hashlib.sha256(
             (
                 self._namespace
                 + json.dumps(task.model_dump(mode="json"), sort_keys=True)
             ).encode()
         ).hexdigest()
-        cached = self._cache.get(key)
+        cached = self._cache.get(key) if use_cache else None
         if cached is not None:
             return cached, True
         if self._generator is not None:

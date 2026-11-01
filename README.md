@@ -3,7 +3,7 @@
 Turn a few event details into a realistic celebration plan, with deterministic
 budgets, timelines and checklists plus creative ideas from Gemini.
 
-**Phase 2 Gemini integration implemented.** CI and coverage badges will be linked when the
+**Phase 3 API and exports implemented.** CI and coverage badges will be linked when the
 GitHub repository exists. A screenshot will be added after the Phase 5 frontend.
 The source of truth is [the PRD](docs/PRD.md).
 
@@ -24,19 +24,24 @@ flowchart LR
 ```
 
 The deterministic engines and service orchestration are implemented, including
-Gemini integration and fallback. Planning endpoints arrive in Phase 3.
+Gemini integration and fallback. Versioned planning endpoints and exports are available.
 
 ## How the Solution Works
 
-The application factory loads validated settings and registers a health router.
+The application factory loads validated settings and owns the service's lifetime.
 `GET /health` returns `{"status":"ok","version":"0.1.0"}` without network I/O.
 The package version is also used in development OpenAPI documentation.
-API docs are disabled by default. No planning endpoints are implemented yet.
+API docs are disabled by default. In development, `/docs` provides Swagger UI,
+`/openapi.json` provides the schema, and `/redoc` redirects to `/docs`.
 Pure Python domain functions generate budgets, chronological milestones with
 phase labels, and vendor checklists. See the [domain example and policies](docs/PHASE_1.md).
 The injected plan service combines those components with validated creative ideas,
 retries one failed model call, and falls back to templates. See the
 [service example and integration decisions](docs/PHASE_2.md).
+
+The API exposes event-type defaults, full plans, budget recalculation, creative
+refresh, refinement, and Markdown/JSON/calendar downloads. See the
+[API contract and examples](docs/API.md) and [Phase 3 decisions](docs/PHASE_3.md).
 
 ## Assumptions
 
@@ -56,6 +61,7 @@ Timelines compress when lead time is short and mark missed deadlines due now.
 Vendor checklists link allocations to questions, documents and booking guidance.
 All three event types are covered. Gemini provides three themes, menus, activities,
 personal touches and saving tips tied to actual budget categories.
+Plans export as readable Markdown, lossless JSON, or all-day milestone calendars.
 
 ## Security
 
@@ -64,14 +70,17 @@ tracked. Settings use a strict environment whitelist and reject unknown dotenv
 keys. Error messages hide input values. Development access logging is disabled
 to avoid recording URL query text. `make check` runs Bandit, pip-audit and
 gitleaks. Free text is delimited and escaped in prompts; generated text is strictly
-validated and sanitised before caching or returning it. API protections and the
-complete threat model arrive in later phases.
+validated and sanitised before caching or returning it. The API enforces bounded
+bodies, request deadlines, per-IP limits, explicit CORS origins, safe error
+envelopes and security headers. See [the current threat model](SECURITY.md).
 
 ## Efficiency
 
 The health endpoint and domain engines have no external calls. One structured
 model call generates ideas, with at most one retry. Timeouts, a concurrency cap,
 an output token ceiling and a bounded TTL/LRU cache control resource use.
+Budget recalculation and exports never call AI. Responses support gzip;
+explicit creative refresh bypasses the existing ideas cache.
 
 ## Testing
 
@@ -114,6 +123,11 @@ defaults to a six-second timeout per attempt, four concurrent calls, and a cache
 of 128 successful idea sets lasting 300 seconds. `.env.example` lists the setting
 names; [Phase 2 notes](docs/PHASE_2.md) describe limits and the opt-in live test.
 
+HTTP defaults are a 256 KiB body limit, 14-second deadline and 60 API requests per
+minute per client address. Cross-origin access requires an explicit allowlist;
+same-origin access works by default. See [HTTP settings](docs/API.md#settings).
+`make run` ignores forwarded headers; deployment proxy trust is configured separately.
+
 Docker and Cloud Run instructions will be added in Phase 4.
 
 ## Project structure
@@ -124,20 +138,20 @@ docs/PHASE_0.md      foundation decisions and verification sources
 src/gatherly/
   main.py           application factory
   config.py         environment and dotenv settings
-  api/              health route and response schema
-  services/         plan orchestration, protocols and creative output validation
+  api/              routers, schemas, errors, request guards and development docs
+  services/         plan orchestration, validation, protocols and text exports
   domain/           models, budget, timeline, vendors and immutable templates
-  infra/            Gemini, clock, prompt loading, cache and runtime composition
+  infra/            Gemini, clock, prompts, cache, rate limiter and composition
 prompts/            packaged, versioned system and refinement policies
 tests/
-  api/              health and documentation tests
+  api/              planning contracts, exports, health and OpenAPI tests
   unit/             settings, domain, template and architecture tests
   property/         generated budget and timeline invariants
-  security/         injection and creative output sanitisation tests
+  security/         injection, HTTP protections and plan import consistency
   live/             optional Gemini smoke test, disabled in CI
 ```
 
-The frontend, API routes and deployment files will be created in their assigned phases.
+Deployment files and the frontend will be created in their assigned phases.
 
 ## Development commands
 
@@ -147,7 +161,7 @@ The frontend, API routes and deployment files will be created in their assigned 
 - `make typecheck`: strict mypy on source and tests.
 - `make test`: pytest with the 90% overall and 100% domain coverage gates.
 - `make check`: all checks, including static, dependency and Git secret scans.
-- `make run`: serve on `127.0.0.1:8000` without access logging.
+- `make run`: serve on `127.0.0.1:8000` without access logging or proxy-header trust.
 
 Stage intended changes before `make check` so the secret scanner includes new
 files. The pre-commit hook checks staged content; CI also scans Git history.
@@ -161,8 +175,9 @@ all checks on the new lock. Never commit virtualenvs, binaries or test reports.
 
 ## Limitations and future work
 
-Full plans and partial creative refinement are available through the Python
-service. Refinement accepts explicit affected sections and an integer budget
-override; money is never inferred by the model. The HTTP planning API starts in
-Phase 3 after approval. Live model quality and latency need a configured key;
-hosted CI and repository visibility need a GitHub remote.
+The API accepts explicit affected sections and an integer budget override for
+refinement; money is never inferred by the model. Rate counters and caches are
+process-local; deployments with multiple workers need perimeter controls.
+Phase 4 deployment hardening starts after approval; the frontend remains Phase 5.
+Live model quality and latency need a configured key; hosted CI and repository
+visibility need a GitHub remote.

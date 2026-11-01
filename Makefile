@@ -41,4 +41,4 @@ scan-staged:
 check: lint typecheck test scan
 
 run:
-	"$(VENV_PYTHON)" -m uvicorn gatherly.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log
+	"$(VENV_PYTHON)" -m uvicorn gatherly.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log --no-proxy-headers
